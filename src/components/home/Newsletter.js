@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { db } from "../../firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, query, where, getDocs } from "firebase/firestore";
 
 export default function Newsletter() {
   const [email, setEmail] = useState("");
@@ -19,8 +19,21 @@ export default function Newsletter() {
     setMessage("");
 
     try {
+      // Check if email already exists in newsletter collection
+      const emailQuery = query(
+        collection(db, "newsletter"), 
+        where("email", "==", email.toLowerCase())
+      );
+      const emailSnapshot = await getDocs(emailQuery);
+      
+      if (!emailSnapshot.empty) {
+        setMessage("You are already subscribed to our newsletter!");
+        return;
+      }
+
+      // Add new subscription
       await addDoc(collection(db, "newsletter"), {
-        email: email,
+        email: email.toLowerCase(),
         subscribedAt: serverTimestamp(),
         status: "active"
       });
@@ -65,7 +78,13 @@ export default function Newsletter() {
                 </button>
               </form>
               {message && (
-                <div className={`mt-3 text-sm ${message.includes('Thank you') ? 'text-green-600' : 'text-red-600'}`}>
+                <div className={`mt-3 text-sm ${
+                  message.includes('Thank you') 
+                    ? 'text-green-600' 
+                    : message.includes('already subscribed')
+                    ? 'text-blue-600'
+                    : 'text-red-600'
+                }`}>
                   {message}
                 </div>
               )}

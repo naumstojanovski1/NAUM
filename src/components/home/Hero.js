@@ -47,7 +47,7 @@ export default function Hero() {
       </p>
       <div className={'transform hover:scale-105 transition duration-300 animate-fadeIn'}>
         <Link to="/rooms" className="bg-secondary text-white py-2 px-4 md:py-3 md:px-5 rounded-md hover:bg-sbackground transition duration-300 hover:text-primary ">
-          Book Your Room
+Discover Our Rooms 
         </Link>
       </div>
 

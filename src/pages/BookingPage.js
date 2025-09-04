@@ -2,8 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import Heading from "../components/common/Heading";
 import { useLocation } from "react-router-dom";
 import { db } from "../firebase";
-import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
-
+import { collection, addDoc, getDocs } from "firebase/firestore";
 export default function Booking() {
   const location = useLocation();
   const searchParams = location.state || {};
@@ -33,39 +32,41 @@ export default function Booking() {
 
   const isOverlapping = (start1, end1, start2, end2) => (start1 < end2 && start2 < end1);
 
-  useEffect(() => {
-    const fetchRooms = async () => {
-      setLoading(true);
-      const roomsSnapshot = await getDocs(collection(db, "rooms"));
-      let allRooms = roomsSnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+  // Extract room fetching logic into a reusable function
+  const fetchRooms = async () => {
+    setLoading(true);
+    const roomsSnapshot = await getDocs(collection(db, "rooms"));
+    let allRooms = roomsSnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
 
-      let filteredRooms = allRooms;
+    let filteredRooms = allRooms;
 
-      if (checkInDate && checkOutDate) {
-        const requestedCheckIn = new Date(checkInDate);
-        const requestedCheckOut = new Date(checkOutDate);
+    if (checkInDate && checkOutDate) {
+      const requestedCheckIn = new Date(checkInDate);
+      const requestedCheckOut = new Date(checkOutDate);
 
-        // Fetch all bookings from the 'bookings' collection
-        const bookingsSnapshot = await getDocs(collection(db, "bookings"));
-        const allBookings = bookingsSnapshot.docs.map(docSnap => docSnap.data());
+      // Fetch all bookings from the 'bookings' collection
+      const bookingsSnapshot = await getDocs(collection(db, "bookings"));
+      const allBookings = bookingsSnapshot.docs.map(docSnap => docSnap.data());
 
-        filteredRooms = allRooms.filter(room => {
-          const meetsOccupancy = (!room.maxOccupancy || (room.maxOccupancy.adults >= numAdults && (room.maxOccupancy.children ? room.maxOccupancy.children >= numChildren : true)));
-          if (!meetsOccupancy) return false;
+      filteredRooms = allRooms.filter(room => {
+        const meetsOccupancy = (!room.maxOccupancy || (room.maxOccupancy.adults >= numAdults && (room.maxOccupancy.children ? room.maxOccupancy.children >= numChildren : true)));
+        if (!meetsOccupancy) return false;
 
-          // Check for overlapping bookings for the current room
-          const roomBookings = allBookings.filter(booking => booking.roomId === room.id);
-          const hasOverlap = roomBookings.some(booking => {
-            const existingCheckIn = new Date(booking.checkInDate);
-            const existingCheckOut = new Date(booking.checkOutDate);
-            return isOverlapping(requestedCheckIn, requestedCheckOut, existingCheckIn, existingCheckOut);
-          });
-          return !hasOverlap;
+        // Check for overlapping bookings for the current room
+        const roomBookings = allBookings.filter(booking => booking.roomId === room.id);
+        const hasOverlap = roomBookings.some(booking => {
+          const existingCheckIn = new Date(booking.checkInDate);
+          const existingCheckOut = new Date(booking.checkOutDate);
+          return isOverlapping(requestedCheckIn, requestedCheckOut, existingCheckIn, existingCheckOut);
         });
-      }
-      setRooms(filteredRooms);
-      setLoading(false);
-    };
+        return !hasOverlap;
+      });
+    }
+    setRooms(filteredRooms);
+    setLoading(false);
+  };
+
+  useEffect(() => {
     fetchRooms();
   }, [checkInDate, checkOutDate, numAdults, numChildren]);
 
@@ -102,6 +103,13 @@ export default function Booking() {
         guest: guest
       });
       setShowSuccess(true);
+      
+      // Refresh the rooms list to remove the booked room
+      // Wait a moment for the booking to be processed, then refresh
+      setTimeout(() => {
+        fetchRooms();
+      }, 1000);
+      
     } catch (error) {
       console.error("Error saving booking:", error);
       setSaving(false);

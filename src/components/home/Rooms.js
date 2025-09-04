@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../../firebase";
 import { collection, getDocs } from "firebase/firestore";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CommonHeading from "../common/CommonHeading";
 
 export default function Rooms({ limit }) {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -39,7 +40,11 @@ export default function Rooms({ limit }) {
         />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {rooms.map((item) => (
-            <div key={item.id} className="shadow-lg rounded-lg overflow-hidden bg-white transform animate-fadeIn hover:scale-105 transition duration-300">
+            <div 
+              key={item.id} 
+              className="shadow-lg rounded-lg overflow-hidden bg-white transform animate-fadeIn hover:scale-105 transition duration-300 cursor-pointer"
+              onClick={() => navigate(`/rooms/${item.id}`)}
+            >
               <div className="relative h-60 w-full">
                 {item.images && item.images.length > 0 && (
                   <img className="w-full h-full object-cover" src={item.images[0]} alt={`CozyStay Room: ${item.name}`} />
@@ -76,20 +81,10 @@ export default function Rooms({ limit }) {
                   )}
                 </div>
                 <p className="text-gray-600 mb-3 text-base leading-relaxed">{item.description}</p>
-                <div className="flex justify-between">
-                  <Link
-                    to={`/rooms/${item.id}`}
-                    className="inline-block bg-primary text-white py-2 px-4 rounded-md text-sm hover:bg-secondary transition duration-300 transform hover:scale-105"
-                  >
+                <div className="flex justify-left ">
+                  <span className="inline-block bg-primary text-white py-2 px-4 rounded-md  text-sm transform hover:bg-secondary transition duration-200">
                     View Details
-                  </Link>
-                  <Link
-                      to={`/rooms/${item.id}`}
-                      className="inline-block border border-primary bg-transparent text-primary py-2 px-4 rounded-md text-sm transition duration-300 transform hover:border-opacity-0 hover:scale-105 hover:bg-secondary hover:text-white"
-                  >
-                    Book Now
-                  </Link>
-
+                  </span>
                 </div>
               </div>
             </div>

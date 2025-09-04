@@ -4,22 +4,23 @@ export const navList = [
     path: "/",
     text: "Home",
   },
-
   {
     id: 3,
-    path: "/services",
-    text: "Services",
-  },
-  {
-    id: 4,
-    path: "/rooms",
-    text: "Rooms",
-  },
-  {
-    id: 5,
     path: "/booking",
     text: "Booking",
   },
+  {
+    id: 4,
+    path: "/services",
+    text: "Services",
+  },  
+
+  {
+    id: 5,
+    path: "/rooms",
+    text: "Rooms",
+  },
+
   {
     id:6,
     path: "/gallery",
@@ -54,17 +55,17 @@ export const about = [
   {
     icon: <i className="fa fa-hotel fa-2x text-primary mb-2"></i>,
     text: "Rooms",
-    count: "7861",
+    count: "7",
   },
   {
     icon: <i className="fa fa-users fa-2x text-primary mb-2"></i>,
     text: "Staffs",
-    count: "1234",
+    count: "30",
   },
   {
     icon: <i className="fa fa-users-cog fa-2x text-primary mb-2"></i>,
     text: "Clients",
-    count: "4321",
+    count: "5000+",
   },
 ];
 
@@ -160,7 +161,7 @@ export const footerContact = [
   },
   {
     icon: <i className="fa fa-envelope me-3"></i>,
-    name: "info@example.com",
+    name: "naumonvd@gmail.com",
   },
 ];
 
@@ -168,16 +169,16 @@ export const contact = [
   {
     icon: <i className="fa fa-envelope-open text-primary me-2"></i>,
     title: "Booking",
-    email: "book@example.com",
+    email: "naumonvd@gmail.com",
   },
   {
     icon: <i className="fa fa-envelope-open text-primary me-2"></i>,
     title: "Technical",
-    email: "tech@example.com",
+    email: "naumonvd@gmail.com",
   },
   {
     icon: <i className="fa fa-envelope-open text-primary me-2"></i>,
     title: "General",
-    email: "info@example.com",
+    email: "naumonvd@gmail.com",
   },
 ];
