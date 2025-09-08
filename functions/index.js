@@ -14,6 +14,15 @@ const logger = require("firebase-functions/logger");
 // Import and export the new sendBookingConfirmationEmail function
 exports.sendBookingConfirmationEmail = require('./sendConfirmationEmail');
 
+// Import and export the message notification function
+exports.sendMessageNotification = require('./sendMessageNotification');
+
+// Import and export the new reply email trigger function
+exports.sendReplyEmailTrigger = require('./sendReplyEmailTrigger');
+
+// Import and export the newsletter trigger function
+exports.sendNewsletterTrigger = require('./sendNewsletterTrigger');
+
 // For cost control, you can set the maximum number of containers that can be
 // running at the same time. This helps mitigate the impact of unexpected
 // traffic spikes by instead downgrading performance. This limit is a

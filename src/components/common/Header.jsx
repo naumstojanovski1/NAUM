@@ -77,8 +77,8 @@ export default function Header() {
                           </NavLink>
                       )}
                     </div>
-                ))}
-              </nav>
+                                 ))}
+               </nav>
             </div>
 
             {/* Mobile button */}
@@ -178,9 +178,9 @@ export default function Header() {
                         {item.text}
                       </NavLink>
                   )}
-                </div>
-            ))}
-          </div>
+                                 </div>
+             ))}
+           </div>
         </div>
       </header>
   );

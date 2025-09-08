@@ -2,8 +2,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import Heading from "../components/common/Heading";
 import { useLocation } from "react-router-dom";
 import { db } from "../firebase";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, orderBy, limit } from "firebase/firestore";
+import { useNotification } from "../components/common/NotificationProvider";
 export default function Booking() {
+  const { showSuccess, showError } = useNotification();
   const location = useLocation();
   const searchParams = location.state || {};
   const { checkIn, checkOut, adults = 1, children = 0 } = searchParams;
@@ -17,7 +19,7 @@ export default function Booking() {
   const [previewRoom, setPreviewRoom] = useState(null);
   const [guest, setGuest] = useState({ firstName: "", lastName: "", email: "", phone: "" });
   const [saving, setSaving] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [bookingDetails, setBookingDetails] = useState(null);
   const todayStr = useMemo(() => new Date().toISOString().split("T")[0], []);
 
@@ -31,6 +33,58 @@ export default function Booking() {
   }, [checkInDate, checkOutDate]);
 
   const isOverlapping = (start1, end1, start2, end2) => (start1 < end2 && start2 < end1);
+
+  // Phone number validation - only allow digits
+  const handlePhoneChange = (value) => {
+    const digitsOnly = value.replace(/\D/g, '');
+    setGuest(prev => ({ ...prev, phone: digitsOnly }));
+  };
+
+  // Counter functions for adults and children
+  const incrementAdults = () => {
+    if (numAdults < 6) setNumAdults(numAdults + 1);
+  };
+
+  const decrementAdults = () => {
+    if (numAdults > 1) setNumAdults(numAdults - 1);
+  };
+
+  const incrementChildren = () => {
+    if (numChildren < 5) setNumChildren(numChildren + 1);
+  };
+
+  const decrementChildren = () => {
+    if (numChildren > 0) setNumChildren(numChildren - 1);
+  };
+
+  // Function to generate booking ID
+  const generateBookingId = async () => {
+    try {
+      // Get the latest booking to determine the next ID
+      const bookingsQuery = query(
+        collection(db, "bookings"), 
+        orderBy("bookingId", "desc"), 
+        limit(1)
+      );
+      const bookingsSnapshot = await getDocs(bookingsQuery);
+      
+      if (bookingsSnapshot.empty) {
+        // First booking
+        return "NA-000001";
+      } else {
+        // Get the latest booking ID and increment it
+        const latestBooking = bookingsSnapshot.docs[0].data();
+        const latestId = latestBooking.bookingId || "NA-000000";
+        const numberPart = parseInt(latestId.split("-")[1]);
+        const nextNumber = numberPart + 1;
+        return `NA-${nextNumber.toString().padStart(6, '0')}`;
+      }
+    } catch (error) {
+      console.error("Error generating booking ID:", error);
+      // Fallback: use timestamp-based ID
+      return `NA-${Date.now().toString().slice(-6)}`;
+    }
+  };
 
   // Extract room fetching logic into a reusable function
   const fetchRooms = async () => {
@@ -77,7 +131,11 @@ export default function Booking() {
     setSaving(true);
     
     try {
+      // Generate unique booking ID
+      const bookingId = await generateBookingId();
+      
       const bookingData = {
+        bookingId, // Add unique booking ID
         checkInDate,
         checkOutDate,
         adults: numAdults,
@@ -95,6 +153,7 @@ export default function Booking() {
       setSaving(false);
       setActiveRoom(null);
       setBookingDetails({
+        bookingId: bookingId,
         room: activeRoom.name,
         checkIn: checkInDate,
         checkOut: checkOutDate,
@@ -102,7 +161,7 @@ export default function Booking() {
         total: (activeRoom.price * nights).toFixed(2),
         guest: guest
       });
-      setShowSuccess(true);
+      setShowSuccessModal(true);
       
       // Refresh the rooms list to remove the booked room
       // Wait a moment for the booking to be processed, then refresh
@@ -113,7 +172,7 @@ export default function Booking() {
     } catch (error) {
       console.error("Error saving booking:", error);
       setSaving(false);
-      alert("Error saving booking. Please try again.");
+      showError("Error saving booking. Please try again.");
     }
   };
 
@@ -134,20 +193,67 @@ export default function Booking() {
             </div>
             <div>
               <label className="block text-sm text-primary mb-1">Adults</label>
-              <select className="w-full p-3 border border-light rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-primary" value={numAdults} onChange={(e) => setNumAdults(parseInt(e.target.value, 10))}>
-                <option value={1}>1 Adult</option>
-                <option value={2}>2 Adults</option>
-                <option value={3}>3 Adults</option>
-              </select>
+              <div className="flex items-center border border-light rounded-md">
+                <button
+                  type="button"
+                  onClick={decrementAdults}
+                  disabled={numAdults <= 1}
+                  className={`px-3 py-3 text-lg font-bold transition-colors ${
+                    numAdults <= 1 
+                      ? 'text-gray-400 cursor-not-allowed' 
+                      : 'text-primary hover:bg-gray-100'
+                  }`}
+                >
+                  −
+                </button>
+                <div className="flex-1 text-center py-3 text-primary font-medium">
+                  {numAdults} {numAdults === 1 ? 'Adult' : 'Adults'}
+                </div>
+                <button
+                  type="button"
+                  onClick={incrementAdults}
+                  disabled={numAdults >= 6}
+                  className={`px-3 py-3 text-lg font-bold transition-colors ${
+                    numAdults >= 6 
+                      ? 'text-gray-400 cursor-not-allowed' 
+                      : 'text-primary hover:bg-gray-100'
+                  }`}
+                >
+                  +
+                </button>
+              </div>
             </div>
             <div>
               <label className="block text-sm text-primary mb-1">Children</label>
-              <select className="w-full p-3 border border-light rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-primary" value={numChildren} onChange={(e) => setNumChildren(parseInt(e.target.value, 10))}>
-                <option value={0}>0 Children</option>
-                <option value={1}>1 Child</option>
-                <option value={2}>2 Children</option>
-                <option value={3}>3 Children</option>
-              </select>
+              <div className="flex items-center border border-light rounded-md">
+                <button
+                  type="button"
+                  onClick={decrementChildren}
+                  disabled={numChildren <= 0}
+                  className={`px-3 py-3 text-lg font-bold transition-colors ${
+                    numChildren <= 0 
+                      ? 'text-gray-400 cursor-not-allowed' 
+                      : 'text-primary hover:bg-gray-100'
+                  }`}
+                >
+                  −
+                </button>
+                <div className="flex-1 text-center py-3 text-primary font-medium">
+                  {numChildren} {numChildren === 1 ? 'Child' : 'Children'}
+                </div>
+                <button
+                  type="button"
+                  onClick={incrementChildren}
+                  disabled={numChildren >= 5}
+                  className={`px-3 py-3 text-lg font-bold transition-colors ${
+                    numChildren >= 5 
+                      ? 'text-gray-400 cursor-not-allowed' 
+                      : 'text-primary hover:bg-gray-100'
+                  }`}
+                >
+                  +
+                </button>
+              </div>
             </div>
             <div className="flex items-end">
               <div className="w-full p-3 bg-light rounded border border-light text-center font-semibold text-dark">{nights} night(s)</div>
@@ -223,7 +329,12 @@ export default function Booking() {
                 </div>
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">Phone</label>
-                  <input className="w-full p-3 border rounded" value={guest.phone} onChange={(e) => setGuest({ ...guest, phone: e.target.value })} />
+                  <input 
+                    className="w-full p-3 border rounded" 
+                    value={guest.phone} 
+                    onChange={(e) => handlePhoneChange(e.target.value)}
+                    placeholder="Enter phone number (digits only)"
+                  />
                 </div>
               </div>
               <div className="flex justify-between text-gray-700">
@@ -295,7 +406,7 @@ export default function Booking() {
       )}
 
       {/* Success Confirmation Modal */}
-      {showSuccess && bookingDetails && (
+      {showSuccessModal && bookingDetails && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-[70] flex items-center justify-center p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
             <div className="p-6 text-center">
@@ -309,6 +420,10 @@ export default function Booking() {
               
               <div className="bg-light rounded-lg p-4 mb-6 text-left">
                 <div className="grid grid-cols-1 gap-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Booking ID:</span>
+                    <span className="font-semibold text-primary">{bookingDetails.bookingId}</span>
+                  </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Room:</span>
                     <span className="font-semibold text-primary">{bookingDetails.room}</span>
@@ -338,7 +453,7 @@ export default function Booking() {
               
               <button
                 onClick={() => {
-                  setShowSuccess(false);
+                  setShowSuccessModal(false);
                   setBookingDetails(null);
                   setGuest({ firstName: "", lastName: "", email: "", phone: "" });
                 }}

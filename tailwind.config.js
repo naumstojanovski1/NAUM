@@ -23,6 +23,19 @@ const config = {
         900: "#171923", // Near black
       },
       "dark-opacity-50": "rgba(87, 10, 31, 0.5)", // Overlay using primary at 50%
+      
+      // Button colors for admin panel
+      success: "#10b981", // Green for success actions
+      warning: "#f59e0b", // Yellow/amber for warnings
+      danger: "#ef4444", // Red for delete/danger actions
+      info: "#3b82f6", // Blue for info actions
+      
+      // Status colors for messages/bookings
+      "status-new": "#ef4444", // Red for new items
+      "status-read": "#f59e0b", // Yellow for read items
+      "status-replied": "#10b981", // Green for replied items
+      "status-completed": "#10b981", // Green for completed items
+      "status-pending": "#3b82f6", // Blue for pending items
     },
     screens: {
       smallest: "320px",

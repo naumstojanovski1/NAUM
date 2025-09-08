@@ -4,6 +4,7 @@ import PageNotFound from "./PageNotFound";
 import Room from "./RoomPage";
 import Services from "./ServicesPage";
 import Gallery from "./GalleryPage";
+import AdminDashboard from "./AdminDashboard";
 import Home from "../components/home/Home";
 
 export {
@@ -14,4 +15,5 @@ export {
   Room,
   Services,
   Gallery,
+  AdminDashboard,
 };

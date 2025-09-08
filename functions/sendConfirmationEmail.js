@@ -82,7 +82,7 @@ exports.sendBookingConfirmationEmail = onDocumentCreated(
               font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
               line-height: 1.6;
               color: #333;
-              background-color: #f4f4f4;
+              background-color: #f9f4f1;
             }
             .email-container {
               max-width: 600px;
@@ -91,7 +91,7 @@ exports.sendBookingConfirmationEmail = onDocumentCreated(
               box-shadow: 0 0 20px rgba(0,0,0,0.1);
             }
             .header {
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              background: linear-gradient(135deg, #570a1f 0%, #9f8266 100%);
               color: white;
               padding: 40px 30px;
               text-align: center;
@@ -115,14 +115,14 @@ exports.sendBookingConfirmationEmail = onDocumentCreated(
               font-weight: 500;
             }
             .booking-details {
-              background-color: #f8f9fa;
+              background-color: #efe7e2;
               border-radius: 10px;
               padding: 30px;
               margin: 30px 0;
-              border-left: 4px solid #667eea;
+              border-left: 4px solid #570a1f;
             }
             .booking-details h2 {
-              color: #2c3e50;
+              color: #570a1f;
               font-size: 20px;
               margin-bottom: 20px;
               font-weight: 600;
@@ -132,7 +132,7 @@ exports.sendBookingConfirmationEmail = onDocumentCreated(
               justify-content: space-between;
               align-items: center;
               padding: 12px 0;
-              border-bottom: 1px solid #e9ecef;
+              border-bottom: 1px solid #c3aa9a;
             }
             .detail-row:last-child {
               border-bottom: none;
@@ -149,7 +149,7 @@ exports.sendBookingConfirmationEmail = onDocumentCreated(
               color: #2c3e50;
             }
             .total-price {
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #570a1f 0%, #9f8266 100%);
               color: white;
               padding: 20px;
               border-radius: 8px;
@@ -161,7 +161,7 @@ exports.sendBookingConfirmationEmail = onDocumentCreated(
               font-weight: 600;
             }
             .footer {
-              background-color: #2c3e50;
+              background-color: #570a1f;
               color: white;
               padding: 30px;
               text-align: center;
@@ -236,9 +236,9 @@ exports.sendBookingConfirmationEmail = onDocumentCreated(
                 <div class="amount">$${(roomPrice * nights).toFixed(2)}</div>
               </div>
               
-              <div style="background-color: #e8f5e8; border-radius: 8px; padding: 20px; margin: 30px 0;">
-                <h3 style="color: #2d5a2d; margin-bottom: 10px;">✨ What to Expect</h3>
-                <ul style="color: #2d5a2d; padding-left: 20px;">
+              <div style="background-color: #efe7e2; border-radius: 8px; padding: 20px; margin: 30px 0;">
+                <h3 style="color: #570a1f; margin-bottom: 10px;">✨ What to Expect</h3>
+                <ul style="color: #4A5568; padding-left: 20px;">
                   <li>Comfortable and clean accommodations</li>
                   <li>Friendly and professional service</li>
                   <li>Convenient check-in process</li>

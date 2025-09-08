@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>
+    .background { fill: #570a1f; }
+    .accent { fill: #9f8266; }
+  </style>
+  <!-- Hotel building silhouette -->
+  <rect class="background" x="4" y="12" width="24" height="16" rx="2"/>
+  <!-- Windows -->
+  <rect class="accent" x="7" y="15" width="3" height="2" rx="0.5"/>
+  <rect class="accent" x="12" y="15" width="3" height="2" rx="0.5"/>
+  <rect class="accent" x="17" y="15" width="3" height="2" rx="0.5"/>
+  <rect class="accent" x="22" y="15" width="3" height="2" rx="0.5"/>
+  <rect class="accent" x="7" y="19" width="3" height="2" rx="0.5"/>
+  <rect class="accent" x="12" y="19" width="3" height="2" rx="0.5"/>
+  <rect class="accent" x="17" y="19" width="3" height="2" rx="0.5"/>
+  <rect class="accent" x="22" y="19" width="3" height="2" rx="0.5"/>
+  <!-- Door -->
+  <rect class="accent" x="14" y="22" width="4" height="6" rx="1"/>
+  <!-- Roof -->
+  <polygon class="background" points="2,12 16,4 30,12"/>
+</svg>

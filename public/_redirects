@@ -1,0 +1,19 @@
+# Netlify redirects for React Router
+# This ensures all routes are handled by the React app
+
+# Admin routes
+/admin/*    /index.html   200
+/admin      /index.html   200
+
+# Other app routes
+/booking/*  /index.html   200
+/booking    /index.html   200
+/rooms/*    /index.html   200
+/rooms      /index.html   200
+/contact    /index.html   200
+/gallery    /index.html   200
+/services   /index.html   200
+/unsubscribe /index.html  200
+
+# Catch all - redirect everything else to index.html
+/*          /index.html   200

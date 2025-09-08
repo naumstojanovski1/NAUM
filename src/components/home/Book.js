@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 export default function Book() {
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
-  const [adults, setAdults] = useState("");
-  const [children, setChildren] = useState("");
+  const [adults, setAdults] = useState(1);
+  const [children, setChildren] = useState(0);
   const navigate = useNavigate();
 
   // Get today's date in YYYY-MM-DD format
@@ -17,10 +17,27 @@ export default function Book() {
       state: {
         checkIn,
         checkOut,
-        adults: parseInt(adults, 10),
-        children: parseInt(children, 10),
+        adults: adults,
+        children: children,
       },
     });
+  };
+
+  // Counter functions
+  const incrementAdults = () => {
+    if (adults < 6) setAdults(adults + 1);
+  };
+
+  const decrementAdults = () => {
+    if (adults > 1) setAdults(adults - 1);
+  };
+
+  const incrementChildren = () => {
+    if (children < 5) setChildren(children + 1);
+  };
+
+  const decrementChildren = () => {
+    if (children > 0) setChildren(children - 1);
   };
 
   // Check if form is valid
@@ -31,8 +48,9 @@ export default function Book() {
       <div className="bg-white shadow-lg p-8 rounded-lg border-t-4 border-primary">
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
           <div className="md:col-span-10">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
               <div className="relative">
+                <label className="block text-sm text-gray-600 mb-2">Check-In</label>
                 <input
                   type="date"
                   className="w-full p-3 border border-light rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-primary placeholder-gray-500"
@@ -43,6 +61,7 @@ export default function Book() {
                 />
               </div>
               <div className="relative">
+                <label className="block text-sm text-gray-600 mb-2">Check-Out</label>
                 <input
                   type="date"
                   className="w-full p-3 border border-light rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-primary placeholder-gray-500"
@@ -53,29 +72,68 @@ export default function Book() {
                 />
               </div>
               <div>
-                <select
-                  className="w-full p-3 border border-light rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-primary"
-                  value={adults}
-                  onChange={(e) => setAdults(e.target.value)}
-                >
-                  <option value="">Guests</option>
-                  <option value="1">1 Adult</option>
-                  <option value="2">2 Adults</option>
-                  <option value="3">3 Adults</option>
-                </select>
+                <label className="block text-sm text-gray-600 mb-2">Adults</label>
+                <div className="flex items-center border border-light rounded-md h-[48px]">
+                  <button
+                    type="button"
+                    onClick={decrementAdults}
+                    disabled={adults <= 1}
+                    className={`px-3 py-3 text-lg font-bold transition-colors h-full ${
+                      adults <= 1 
+                        ? 'text-gray-400 cursor-not-allowed' 
+                        : 'text-primary hover:bg-gray-100'
+                    }`}
+                  >
+                    −
+                  </button>
+                  <div className="flex-1 text-center py-3 text-primary font-medium">
+                    {adults} {adults === 1 ? 'Adult' : 'Adults'}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={incrementAdults}
+                    disabled={adults >= 6}
+                    className={`px-3 py-3 text-lg font-bold transition-colors h-full ${
+                      adults >= 6 
+                        ? 'text-gray-400 cursor-not-allowed' 
+                        : 'text-primary hover:bg-gray-100'
+                    }`}
+                  >
+                    +
+                  </button>
+                </div>
               </div>
               <div>
-                <select
-                  className="w-full p-3 border border-light rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-primary"
-                  value={children}
-                  onChange={(e) => setChildren(e.target.value)}
-                >
-                  <option value="">Children</option>
-                  <option value="0">0 Children</option>
-                  <option value="1">1 Child</option>
-                  <option value="2">2 Children</option>
-                  <option value="3">3 Children</option>
-                </select>
+                <label className="block text-sm text-gray-600 mb-2">Children</label>
+                <div className="flex items-center border border-light rounded-md h-[48px]">
+                  <button
+                    type="button"
+                    onClick={decrementChildren}
+                    disabled={children <= 0}
+                    className={`px-3 py-3 text-lg font-bold transition-colors h-full ${
+                      children <= 0 
+                        ? 'text-gray-400 cursor-not-allowed' 
+                        : 'text-primary hover:bg-gray-100'
+                    }`}
+                  >
+                    −
+                  </button>
+                  <div className="flex-1 text-center py-3 text-primary font-medium">
+                    {children} {children === 1 ? 'Child' : 'Children'}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={incrementChildren}
+                    disabled={children >= 5}
+                    className={`px-3 py-3 text-lg font-bold transition-colors h-full ${
+                      children >= 5 
+                        ? 'text-gray-400 cursor-not-allowed' 
+                        : 'text-primary hover:bg-gray-100'
+                    }`}
+                  >
+                    +
+                  </button>
+                </div>
               </div>
             </div>
           </div>

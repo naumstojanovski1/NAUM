@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { db } from "../../firebase";
-import { collection, addDoc, serverTimestamp, query, where, getDocs } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, query, where, getDocs, updateDoc } from "firebase/firestore";
 
 export default function Newsletter() {
   const [email, setEmail] = useState("");
@@ -27,8 +27,25 @@ export default function Newsletter() {
       const emailSnapshot = await getDocs(emailQuery);
       
       if (!emailSnapshot.empty) {
-        setMessage("You are already subscribed to our newsletter!");
-        return;
+        const existingSubscriber = emailSnapshot.docs[0].data();
+        
+        // If subscriber exists and is active, show already subscribed message
+        if (existingSubscriber.status === 'active') {
+          setMessage("You are already subscribed to our newsletter!");
+          return;
+        }
+        
+        // If subscriber exists but is unsubscribed, reactivate them
+        if (existingSubscriber.status === 'unsubscribed') {
+          const subscriberRef = emailSnapshot.docs[0].ref;
+          await updateDoc(subscriberRef, {
+            status: 'active',
+            resubscribedAt: serverTimestamp()
+          });
+          setEmail("");
+          setMessage("Welcome back! You have been resubscribed to our newsletter!");
+          return;
+        }
       }
 
       // Add new subscription
@@ -48,34 +65,36 @@ export default function Newsletter() {
     }
   };
   return (
-    <div className="container mx-auto mt-5 px-4 relative z-[10]">
+    <div className="container mx-auto mt-5 px-3 sm:px-4 relative z-[10]">
       <div className="flex justify-center">
-        <div className="w-full lg:w-10/12 border border-primary rounded p-1 shadow-md">
+        <div className="w-full max-w-md sm:max-w-lg lg:w-10/12 border border-primary rounded p-1 shadow-md">
           <div className="border border-secondary rounded text-center p-1">
-            <div className="bg-white rounded text-center p-5">
-              <h4 className="mb-4 text-2xl font-bold text-secondary">
+            <div className="bg-white rounded text-center p-3 sm:p-5">
+              <h4 className="mb-4 text-base sm:text-lg lg:text-2xl font-bold text-secondary">
                 Get the best deals at <span className="text-primary uppercase">NaumApartments</span>
               </h4>
-              <form onSubmit={handleSubmit} className="relative mx-auto max-w-md">
-                <input
-                  className="w-full py-3 ps-4 pe-5 border border-secondary rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-dark"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className={`py-2 px-3 absolute top-0 right-0 mt-1 mr-2 text-white rounded-md transition duration-300 ${
-                    isSubmitting 
-                      ? 'bg-gray-400 cursor-not-allowed' 
-                      : 'bg-primary hover:bg-secondary'
-                  }`}
-                >
-                  {isSubmitting ? "Subscribing..." : "Subscribe"}
-                </button>
+              <form onSubmit={handleSubmit} className="w-full">
+                <div className="flex flex-col sm:flex-row gap-2 w-full">
+                  <input
+                    className="flex-1 py-3 px-3 sm:px-4 border border-secondary rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-dark text-sm sm:text-base"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className={`py-3 px-4 sm:px-6 text-white rounded-md transition duration-300 font-medium text-sm sm:text-base whitespace-nowrap ${
+                      isSubmitting 
+                        ? 'bg-gray-400 cursor-not-allowed' 
+                        : 'bg-primary hover:bg-secondary'
+                    }`}
+                  >
+                    {isSubmitting ? "Subscribing..." : "Subscribe"}
+                  </button>
+                </div>
               </form>
               {message && (
                 <div className={`mt-3 text-sm ${
