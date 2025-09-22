@@ -34,7 +34,7 @@ export default function Rooms({ limit }) {
     <div className="container mx-auto py-12 px-4 bg-light">
       <div className="container">
         <CommonHeading
-          heading="Our Cozy Rooms"
+          heading="Our Rooms"
           title="Comfort Awaits"
           subtitle="Explore Our"
         />

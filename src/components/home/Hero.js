@@ -32,7 +32,7 @@ export default function Hero() {
     <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: "url('https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')",
+          backgroundImage: "url('/assets/img/commonHeadingBG.jpg')",
         }}
     />
     <div className="absolute inset-0 bg-primary/60" />

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { footerContact, footerItem, socialIcons } from "../data/Data";
+import { footerContact, socialIcons, navList, services } from "../data/Data";
 import Newsletter from "../home/Newsletter";
 
 export default function Footer() {
@@ -36,7 +36,9 @@ export default function Footer() {
                 <a
                   key={index}
                   className="w-9 h-9 flex items-center justify-center rounded-full border border-primary text-primary hover:bg-primary hover:text-white transition-colors duration-300"
-                  href="#"
+                  href={val.href || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   {val.icon}
                 </a>
@@ -44,27 +46,40 @@ export default function Footer() {
             </div>
           </div>
 
+          {/* Quick Links and Services */}
           <div className="lg:col-span-2">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-              {footerItem.map((section, sectionIndex) => (
-                <div key={sectionIndex}>
-                  <h6 className="text-xl font-bold text-primary uppercase mb-4">
-                    {section.header}
-                  </h6>
-                  <ul className="space-y-2">
-                    {section.UnitItem.map((item, itemIndex) => (
-                      <li key={itemIndex}>
-                        <Link
-                          to="#"
-                          className="text-primary hover:text-primary transition-colors duration-300"
-                        >
-                          {item.name}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+              <div>
+                <h6 className="text-xl font-bold text-primary uppercase mb-4">
+                  Quick Links
+                </h6>
+                <ul className="space-y-2">
+                  {navList.map((item) => (
+                    <li key={item.id}>
+                      <Link
+                        to={item.path}
+                        className="text-primary hover:text-secondary transition-colors duration-300"
+                      >
+                        {item.text}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h6 className="text-xl font-bold text-primary uppercase mb-4">
+                  Our Services
+                </h6>
+                <ul className="space-y-2">
+                  {services.map((s, idx) => (
+                    <li key={idx}>
+                      <Link to="/services" className="text-primary hover:text-secondary transition-colors duration-300">
+                        {s.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         </div>

@@ -63,11 +63,11 @@ const config = {
     },
     extend: {
       backgroundImage: {
-        "carousel-1": "url('/public/assets/img/carousel-1.jpg')",
-        "carousel-2": "url('/public/assets/img/carousel-2.jpg')",
-        "room-1": "url('/public/assets/img/room-1.jpg')",
-        "room-2": "url('/public/assets/img/room-2.jpg')",
-        "room-3": "url('/public/assets/img/room-3.jpg')",
+        "carousel-1": "url('/assets/img/carousel-1.jpg')",
+        "carousel-2": "url('/assets/img/carousel-2.jpg')",
+        "room-1": "url('/assets/img/room-1.jpg')",
+        "room-2": "url('/assets/img/room-2.jpg')",
+        "room-3": "url('/assets/img/room-3.jpg')",
       },
       keyframes: {
         slideInDown: {

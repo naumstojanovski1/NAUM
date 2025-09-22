@@ -36,18 +36,23 @@ export const navList = [
 export const socialIcons = [
   {
     icon: <i className="fab fa-facebook-f"></i>,
+    href: "https://facebook.com/NaumApartments"
   },
   {
     icon: <i className="fab fa-twitter"></i>,
+    href: "https://twitter.com/NaumApartments"
   },
   {
     icon: <i className="fab fa-instagram"></i>,
+    href: "https://instagram.com/NaumApartments"
   },
   {
     icon: <i className="fab fa-linkedin-in"></i>,
+    href: "https://linkedin.com/company/NaumApartments"
   },
   {
     icon: <i className="fab fa-youtube"></i>,
+    href: "https://youtube.com/@NaumApartments"
   },
 ];
 

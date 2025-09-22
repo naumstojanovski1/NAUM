@@ -3,7 +3,10 @@ import { Link } from "react-router-dom";
 
 export default function Heading({ heading, title, subtitle }) {
   return (
-      <div className="relative h-64 md:h-80 mb-5 overflow-hidden bg-room-2 bg-cover bg-center">
+      <div
+        className="relative h-64 md:h-80 mb-5 overflow-hidden bg-cover bg-center"
+        style={{ backgroundImage: "url('/assets/img/commonHeadingBG.jpg')" }}
+      >
         <div className="absolute inset-0 bg-dark-opacity-50"></div>
 
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-4">

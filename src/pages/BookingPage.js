@@ -17,6 +17,7 @@ export default function Booking() {
   const [loading, setLoading] = useState(true);
   const [activeRoom, setActiveRoom] = useState(null);
   const [previewRoom, setPreviewRoom] = useState(null);
+  const [previewIndex, setPreviewIndex] = useState(0);
   const [guest, setGuest] = useState({ firstName: "", lastName: "", email: "", phone: "" });
   const [saving, setSaving] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -84,6 +85,55 @@ export default function Booking() {
       // Fallback: use timestamp-based ID
       return `NA-${Date.now().toString().slice(-6)}`;
     }
+  };
+
+  // Local image mapping fallback by room name (if Firestore images missing)
+  const getLocalImagesForRoom = (name) => {
+    const map = {
+      "Standard Single": [
+        "/assets/img/room/photo1.avif",
+        "/assets/img/room/photo2.avif",
+        "/assets/img/room/photo3.avif",
+        "/assets/img/room/photo4.avif",
+        "/assets/img/room/photo5.webp",
+      ],
+      "Deluxe Double": [
+        "/assets/img/room (2)/photo1.webp",
+        "/assets/img/room (2)/photo2.jpeg",
+        "/assets/img/room (2)/photo3.webp",
+        "/assets/img/room (2)/photo4.avif",
+        "/assets/img/room (2)/photo5.webp",
+      ],
+      "Family Suite": [
+        "/assets/img/room (3)/photo1.avif",
+        "/assets/img/room (3)/photo2.avif",
+        "/assets/img/room (3)/photo3.webp",
+        "/assets/img/room (3)/photo4.avif",
+        "/assets/img/room (3)/photo5.avif",
+      ],
+      "Presidential Penthouse": [
+        "/assets/img/room (4)/photo1.avif",
+        "/assets/img/room (4)/photo2.avif",
+        "/assets/img/room (4)/photo3.avif",
+        "/assets/img/room (4)/photo4.avif",
+        "/assets/img/room (4)/photo5.avif",
+      ],
+      "Presidental Penthouse": [
+        "/assets/img/room (4)/photo1.avif",
+        "/assets/img/room (4)/photo2.avif",
+        "/assets/img/room (4)/photo3.avif",
+        "/assets/img/room (4)/photo4.avif",
+        "/assets/img/room (4)/photo5.avif",
+      ],
+      "Executive Suite": [
+        "/assets/img/room (5)/photo1.avif",
+        "/assets/img/room (5)/photo2.avif",
+        "/assets/img/room (5)/photo3.avif",
+        "/assets/img/room (5)/photo4.avif",
+        "/assets/img/room (5)/photo5.avif",
+      ],
+    };
+    return map[name];
   };
 
   // Extract room fetching logic into a reusable function
@@ -175,6 +225,36 @@ export default function Booking() {
       showError("Error saving booking. Please try again.");
     }
   };
+
+  // Preview modal helpers
+  const previewImages = useMemo(() => {
+    if (!previewRoom) return [];
+    const imgs = Array.isArray(previewRoom.images) && previewRoom.images.length > 0
+      ? previewRoom.images
+      : getLocalImagesForRoom(previewRoom.name) || [];
+    return imgs;
+  }, [previewRoom]);
+
+  const goPrevPreview = () => {
+    if (!previewImages.length) return;
+    setPreviewIndex((i) => (i === 0 ? previewImages.length - 1 : i - 1));
+  };
+
+  const goNextPreview = () => {
+    if (!previewImages.length) return;
+    setPreviewIndex((i) => (i === previewImages.length - 1 ? 0 : i + 1));
+  };
+
+  useEffect(() => {
+    if (!previewRoom) return;
+    const onKey = (e) => {
+      if (e.key === 'ArrowLeft') goPrevPreview();
+      if (e.key === 'ArrowRight') goNextPreview();
+      if (e.key === 'Escape') setPreviewRoom(null);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [previewRoom]);
 
   return (
     <div>
@@ -286,7 +366,7 @@ export default function Booking() {
                       <div className="grid grid-cols-2 gap-3 mt-4">
                         <button
                           className="w-full bg-white border text-dark py-2 rounded hover:bg-gray-50"
-                          onClick={() => setPreviewRoom(room)}
+                          onClick={() => { setPreviewRoom(room); setPreviewIndex(0); }}
                         >
                           View details
                         </button>
@@ -358,20 +438,58 @@ export default function Booking() {
 
       {previewRoom && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
             <div className="p-5 border-b flex justify-between items-center">
               <h4 className="text-lg font-semibold text-dark">{previewRoom.name}</h4>
-              <button className="text-gray-500 hover:text-dark" onClick={() => setPreviewRoom(null)}>
-                <span className="sr-only">Close</span>
+              <button className="text-gray-500 hover:text-dark text-2xl leading-none" onClick={() => setPreviewRoom(null)}>
                 ×
               </button>
             </div>
-            {previewRoom.images && previewRoom.images.length > 0 && (
-              <div className="w-full h-72 overflow-hidden">
-                <img className="w-full h-full object-cover" src={previewRoom.images[0]} alt={previewRoom.name} />
+            {/* Slider area */}
+            <div className="relative w-full h-72 md:h-[420px] bg-black">
+              {previewImages.length > 0 && (
+                <img
+                  key={previewImages[previewIndex]}
+                  src={previewImages[previewIndex]}
+                  alt={`${previewRoom.name} ${previewIndex + 1}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => { e.currentTarget.src = previewImages[0]; }}
+                />
+              )}
+              <button
+                className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-dark p-2 rounded-full"
+                onClick={goPrevPreview}
+                aria-label="Previous"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+              </button>
+              <button
+                className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-dark p-2 rounded-full"
+                onClick={goNextPreview}
+                aria-label="Next"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              </button>
+            </div>
+            {/* Thumbs */}
+            <div className="p-4 border-t">
+              <div className="flex gap-2 overflow-x-auto">
+                {previewImages.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setPreviewIndex(idx)}
+                    className={`relative w-16 h-16 rounded-md overflow-hidden border ${
+                      idx === previewIndex ? 'border-primary ring-2 ring-primary/40' : 'border-gray-200'
+                    }`}
+                    aria-label={`Thumbnail ${idx + 1}`}
+                  >
+                    <img src={img} alt={`Thumb ${idx + 1}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
               </div>
-            )}
-            <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+            </div>
+            {/* Details */}
+            <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4 border-t overflow-y-auto">
               {previewRoom.description && (
                 <p className="text-gray-700">{previewRoom.description}</p>
               )}
@@ -385,7 +503,7 @@ export default function Booking() {
                     )}
                   </div>
                 )}
-                {previewRoom.amenities && previewRoom.amenities.length > 0 && (
+                {Array.isArray(previewRoom.amenities) && previewRoom.amenities.length > 0 && (
                   <div>
                     <h5 className="font-semibold text-dark mb-1">Amenities</h5>
                     <ul className="list-disc list-inside text-gray-600">
@@ -396,10 +514,6 @@ export default function Booking() {
                   </div>
                 )}
               </div>
-            </div>
-            <div className="p-5 border-t flex gap-3 justify-end">
-              <button className="px-4 py-2 rounded border" onClick={() => setPreviewRoom(null)}>Close</button>
-              <button className="px-4 py-2 rounded bg-primary text-white" onClick={() => { setActiveRoom(previewRoom); setPreviewRoom(null); }}>Reserve</button>
             </div>
           </div>
         </div>
